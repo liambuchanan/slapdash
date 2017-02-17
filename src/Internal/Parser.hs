@@ -6,8 +6,8 @@ import           Numeric                       (readHex, readInt, readOct)
 import           Text.ParserCombinators.Parsec (Parser, anyChar, between, char,
                                                 choice, digit, hexDigit, letter,
                                                 many, many1, noneOf, octDigit,
-                                                oneOf, parse, skipMany1, space,
-                                                string, try, (<|>))
+                                                oneOf, parse, sepBy, skipMany1,
+                                                space, string, try, (<|>))
 
 data LispVal = Atom String
              | Bool Bool
@@ -66,6 +66,9 @@ parseFloat = do
   char '.'
   post <- many1 digit
   return (Float (read (pre ++ "." ++ post)))
+
+parseList :: Parser LispVal
+parseList = List <$> sepBy parseExpr spaces
 
 parseNumber :: Parser LispVal
 parseNumber = parseBinary <|> parseDecimal1 <|> parseDecimal2 <|> parseOctal <|> parseHexadecimal
