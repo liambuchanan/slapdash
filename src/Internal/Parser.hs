@@ -1,5 +1,6 @@
 module Internal.Parser where
 
+-- TODO complex numbers are ratios
 import           Data.Char                     (digitToInt)
 import           Numeric                       (readHex, readInt, readOct)
 import           Text.ParserCombinators.Parsec (Parser, anyChar, between, char,
