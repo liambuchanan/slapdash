@@ -33,11 +33,9 @@ spec = do
 
   describe "Internal.Parser.parseCharacter" $ do
     it "should parse a normal char" $ do
-      parse parseCharacter "" "'a'" `shouldBe` (Right (Character 'a'))
-    it "should parse an escaped single quote" $ do
-      parse parseCharacter "" "'\\''" `shouldBe` (Right (Character '\''))
-    it "should not parse multiple characters" $ do
-      parse parseCharacter "" "'asdf'" `shouldSatisfy` isLeft
+      parse parseCharacter "" "#\\a" `shouldBe` (Right (Character 'a'))
+    it "should parse #\\newline as the newline char" $ do
+      parse parseCharacter "" "#\\newline" `shouldBe` (Right (Character '\n'))
 
   describe "Internal.Parser.parseNumber" $ do
     it "should parse a decimal number" $ do

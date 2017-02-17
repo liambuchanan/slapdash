@@ -42,7 +42,19 @@ parseBool = parseBool' 't' True <|> parseBool' 'f' False
     parseBool' c r = try (string ['#', c]) >> return (Bool r)
 
 parseCharacter :: Parser LispVal
-parseCharacter = fmap Character (between (char '\'') (char '\'') (escCode <|> noneOf "\'"))
+parseCharacter = (string "#\\") >> (parseSpecial <|> parseCharacter')
+  where
+    parseSpecial = (choice . map (\(s, r) -> try (string s) >> return (Character r)))
+                     [ ("newline", '\n')
+                     , ("linefeed", '\n')
+                     , ("space", ' ')
+                     , ("tab", '\t')
+                     , ("return", '\r')
+                     ]
+    parseCharacter' = do
+      c <- anyChar
+      return (Character c)
+
 
 -- parseDottedList :: Parser LispVal parseList :: Parser LispVal
 parseNumber :: Parser LispVal
