@@ -3,10 +3,10 @@ module Internal.Parser where
 import           Data.Char                     (digitToInt)
 import           Numeric                       (readHex, readInt, readOct)
 import           Text.ParserCombinators.Parsec (Parser, anyChar, between, char,
-                                                choice, digit, letter, many,
-                                                many1, noneOf, octDigit, oneOf,
-                                                parse, skipMany1, space, string,
-                                                try, (<|>))
+                                                choice, digit, hexDigit, letter,
+                                                many, many1, noneOf, octDigit,
+                                                oneOf, parse, skipMany1, space,
+                                                string, try, (<|>))
 
 data LispVal = Atom String
              | Bool Bool
@@ -48,7 +48,7 @@ parseCharacter = fmap Character (between (char '\'') (char '\'') (escCode <|> no
 parseNumber :: Parser LispVal
 -- TODO parse for #b -> binary, #o -> octal, #d -> decimal, -> #x -> hex readInt 2 (flip elem "01")
 -- digitToInt readOct readHex
-parseNumber = parseBinary <|> parseDecimal1 <|> parseDecimal2 <|> parseOctal
+parseNumber = parseBinary <|> parseDecimal1 <|> parseDecimal2 <|> parseOctal <|> parseHexadecimal
   where
     parseDecimal1 = fmap (Number . read) (many1 digit)
     parseDecimal2 = try (string "#d") >> parseDecimal1
@@ -60,6 +60,10 @@ parseNumber = parseBinary <|> parseDecimal1 <|> parseDecimal2 <|> parseOctal
       try (string "#o")
       n <- many1 octDigit
       return (Number ((fst . head) (readOct n)))
+    parseHexadecimal = do
+      try (string "#h")
+      n <- many1 hexDigit
+      return (Number ((fst . head) (readHex n)))
 
 parseString :: Parser LispVal
 parseString = fmap String (between (char '"') (char '"') (many (escCode <|> noneOf "\"")))
