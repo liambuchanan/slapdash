@@ -1,7 +1,7 @@
 module Main where
 
+import           Parser             (readExpr)
 import           System.Environment
-import Lib (readExpr)
 
 main :: IO ()
 main = do
