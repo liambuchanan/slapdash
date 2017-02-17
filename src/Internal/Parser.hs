@@ -4,10 +4,11 @@ module Internal.Parser where
 import           Data.Char                     (digitToInt)
 import           Numeric                       (readHex, readInt, readOct)
 import           Text.ParserCombinators.Parsec (Parser, anyChar, between, char,
-                                                choice, digit, hexDigit, letter,
-                                                many, many1, noneOf, octDigit,
-                                                oneOf, parse, sepBy, skipMany1,
-                                                space, string, try, (<|>))
+                                                choice, digit, endBy, hexDigit,
+                                                letter, many, many1, noneOf,
+                                                octDigit, oneOf, parse, sepBy,
+                                                skipMany1, space, string, try,
+                                                (<|>))
 
 data LispVal = Atom String
              | Bool Bool
@@ -59,6 +60,9 @@ parseCharacter = string "#\\" >> (parseSpecial <|> parseCharacter')
                      , ("return", '\r')
                      ]
     parseCharacter' = Character <$> anyChar
+
+parseDottedList :: Parser LispVal
+parseDottedList = DottedList <$> endBy parseExpr spaces <*> (char '.' >> spaces >> parseExpr)
 
 parseFloat :: Parser LispVal
 parseFloat = do
