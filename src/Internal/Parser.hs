@@ -50,12 +50,12 @@ parseNumber :: Parser LispVal
 -- digitToInt readOct readHex
 parseNumber = parseBinary <|> parseDecimal1 <|> parseDecimal2 <|> parseOctal
   where
-    parseDecimal1 = (fmap (Number . read) (many1 digit))
+    parseDecimal1 = fmap (Number . read) (many1 digit)
     parseDecimal2 = try (string "#d") >> parseDecimal1
     parseBinary = do
       try (string "#b")
       n <- many1 (oneOf "01")
-      return (Number ((fst . head) (readInt 2 (flip elem "01") digitToInt n)))
+      return (Number ((fst . head) (readInt 2 (`elem` "01") digitToInt n)))
     parseOctal = do
       try (string "#o")
       n <- many1 octDigit
