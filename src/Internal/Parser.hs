@@ -1,5 +1,7 @@
 module Internal.Parser where
 
+import           Data.Char                     (digitToInt)
+import           Numeric                       (readHex, readInt, readOct)
 import           Text.ParserCombinators.Parsec (Parser, anyChar, between, char,
                                                 choice, digit, letter, many,
                                                 many1, noneOf, oneOf, parse,
@@ -45,10 +47,15 @@ parseCharacter = fmap Character (between (char '\'') (char '\'') (escCode <|> no
 -- parseDottedList :: Parser LispVal parseList :: Parser LispVal
 parseNumber :: Parser LispVal
 -- TODO parse for #b -> binary, #o -> octal, #d -> decimal, -> #x -> hex readInt 2 (flip elem "01")
--- digitToInt "01010101" readOct readHex
-parseNumber = parseDecimal
+-- digitToInt readOct readHex
+parseNumber = parseBinary <|> parseDecimal1 <|> parseDecimal2
   where
-    parseDecimal = fmap (Number . read) (many1 digit)
+    parseDecimal1 = (fmap (Number . read) (many1 digit))
+    parseDecimal2 = try (string "#d") >> parseDecimal1
+    parseBinary = do
+      try (string "#b")
+      n <- many1 (oneOf "01")
+      return (Number ((fst . head) (readInt 2 (flip elem "01") digitToInt n)))
 
 parseString :: Parser LispVal
 parseString = fmap String (between (char '"') (char '"') (many (escCode <|> noneOf "\"")))
