@@ -61,7 +61,6 @@ parseCharacter = (string "#\\") >> (parseSpecial <|> parseCharacter')
       return (Character c)
 
 
--- parseDottedList :: Parser LispVal parseList :: Parser LispVal
 parseNumber :: Parser LispVal
 -- TODO parse for #b -> binary, #o -> octal, #d -> decimal, -> #x -> hex readInt 2 (flip elem "01")
 -- digitToInt readOct readHex
