@@ -49,7 +49,7 @@ parseBool = parseBool' 't' True <|> parseBool' 'f' False
     parseBool' c r = try (string ['#', c]) >> return (Bool r)
 
 parseCharacter :: Parser LispVal
-parseCharacter = (string "#\\") >> (parseSpecial <|> parseCharacter')
+parseCharacter = string "#\\" >> (parseSpecial <|> parseCharacter')
   where
     parseSpecial = (choice . map (\(s, r) -> try (string s) >> return (Character r)))
                      [ ("newline", '\n')
@@ -58,9 +58,7 @@ parseCharacter = (string "#\\") >> (parseSpecial <|> parseCharacter')
                      , ("tab", '\t')
                      , ("return", '\r')
                      ]
-    parseCharacter' = do
-      c <- anyChar
-      return (Character c)
+    parseCharacter' = Character <$> anyChar
 
 parseFloat :: Parser LispVal
 parseFloat = do
@@ -92,9 +90,11 @@ parseString = fmap String (between (char '"') (char '"') (many (escCode <|> none
 
 parseExpr :: Parser LispVal
 parseExpr = parseAtom
+            <|> try parseBool
+            <|> try parseCharacter
+            <|> parseFloat
+            <|> try parseNumber
             <|> parseString
-            <|> parseNumber
-            <|> parseBool
 
 readExpr :: String -> String
 readExpr input =
