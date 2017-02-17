@@ -93,7 +93,7 @@ parseNumber = parseBinary <|> parseDecimal1 <|> parseDecimal2 <|> parseOctal <|>
       return (Number ((fst . head) (readHex n)))
 
 parseString :: Parser LispVal
-parseString = fmap String (between (char '"') (char '"') (many (escCode <|> noneOf "\"")))
+parseString = String <$> between (char '"') (char '"') (many (escCode <|> noneOf "\""))
 
 parseExpr :: Parser LispVal
 parseExpr = parseAtom
