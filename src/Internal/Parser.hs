@@ -24,10 +24,15 @@ symbol :: Parser Char
 symbol = oneOf "!$%&|*+-/:<=>?@^_~"
 
 escCode :: Parser Char
-escCode =
-  char '\\' >>
-  (choice . map (\(c, r) -> char c >> return r))
-    [('\'', '\''), ('"', '"'), ('\\', '\\'), ('f', '\f'), ('n', '\n'), ('r', '\r'), ('t', '\t')]
+escCode = char '\\' >> (choice . map (\(c, r) -> char c >> return r))
+                         [ ('\'', '\'')
+                         , ('"', '"')
+                         , ('\\', '\\')
+                         , ('f', '\f')
+                         , ('n', '\n')
+                         , ('r', '\r')
+                         , ('t', '\t')
+                         ]
 
 parseAtom :: Parser LispVal
 parseAtom = do
