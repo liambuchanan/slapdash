@@ -4,9 +4,9 @@ import           Data.Char                     (digitToInt)
 import           Numeric                       (readHex, readInt, readOct)
 import           Text.ParserCombinators.Parsec (Parser, anyChar, between, char,
                                                 choice, digit, letter, many,
-                                                many1, noneOf, oneOf, parse,
-                                                skipMany1, space, string, try,
-                                                (<|>))
+                                                many1, noneOf, octDigit, oneOf,
+                                                parse, skipMany1, space, string,
+                                                try, (<|>))
 
 data LispVal = Atom String
              | Bool Bool
@@ -48,7 +48,7 @@ parseCharacter = fmap Character (between (char '\'') (char '\'') (escCode <|> no
 parseNumber :: Parser LispVal
 -- TODO parse for #b -> binary, #o -> octal, #d -> decimal, -> #x -> hex readInt 2 (flip elem "01")
 -- digitToInt readOct readHex
-parseNumber = parseBinary <|> parseDecimal1 <|> parseDecimal2
+parseNumber = parseBinary <|> parseDecimal1 <|> parseDecimal2 <|> parseOctal
   where
     parseDecimal1 = (fmap (Number . read) (many1 digit))
     parseDecimal2 = try (string "#d") >> parseDecimal1
@@ -56,6 +56,10 @@ parseNumber = parseBinary <|> parseDecimal1 <|> parseDecimal2
       try (string "#b")
       n <- many1 (oneOf "01")
       return (Number ((fst . head) (readInt 2 (flip elem "01") digitToInt n)))
+    parseOctal = do
+      try (string "#o")
+      n <- many1 octDigit
+      return (Number ((fst . head) (readOct n)))
 
 parseString :: Parser LispVal
 parseString = fmap String (between (char '"') (char '"') (many (escCode <|> noneOf "\"")))
