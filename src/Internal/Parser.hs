@@ -12,6 +12,7 @@ data LispVal = Atom String
              | Bool Bool
              | Character Char
              | DottedList [LispVal] LispVal
+             | Float Double
              | List [LispVal]
              | Number Integer
              | String String
@@ -60,6 +61,12 @@ parseCharacter = (string "#\\") >> (parseSpecial <|> parseCharacter')
       c <- anyChar
       return (Character c)
 
+parseFloat :: Parser LispVal
+parseFloat = do
+  pre <- many1 digit
+  char '.'
+  post <- many1 digit
+  return (Float (read (pre ++ "." ++ post)))
 
 parseNumber :: Parser LispVal
 parseNumber = parseBinary <|> parseDecimal1 <|> parseDecimal2 <|> parseOctal <|> parseHexadecimal

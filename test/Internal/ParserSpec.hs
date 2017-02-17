@@ -37,6 +37,10 @@ spec = do
     it "should parse #\\newline as the newline char" $ do
       parse parseCharacter "" "#\\newline" `shouldBe` (Right (Character '\n'))
 
+  describe "Internal.Parser.parseFloat" $ do
+    it "should parse 1.1" $ do
+      parse parseFloat "" "1.1" `shouldBe` (Right (Float 1.1))
+
   describe "Internal.Parser.parseNumber" $ do
     it "should parse a decimal number" $ do
       parse parseNumber "" "123" `shouldBe` (Right (Number 123))
