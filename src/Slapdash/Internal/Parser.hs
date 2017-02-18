@@ -1,24 +1,15 @@
-module Internal.Parser where
+module Slapdash.Internal.Parser where
 
 -- TODO complex numbers are ratios
 import           Data.Char                     (digitToInt)
 import           Numeric                       (readHex, readInt, readOct)
+import           Slapdash.AST                  (LispVal (..))
 import           Text.ParserCombinators.Parsec (Parser, anyChar, between, char,
                                                 choice, digit, endBy, hexDigit,
                                                 letter, many, many1, noneOf,
-                                                octDigit, oneOf, parse, sepBy,
+                                                octDigit, oneOf, sepBy,
                                                 skipMany1, space, string, try,
                                                 (<|>))
-
-data LispVal = Atom String
-             | Bool Bool
-             | Character Char
-             | DottedList [LispVal] LispVal
-             | Float Double
-             | List [LispVal]
-             | Number Integer
-             | String String
-  deriving (Eq, Show)
 
 spaces :: Parser ()
 spaces = skipMany1 space
@@ -102,9 +93,3 @@ parseExpr = parseAtom
             <|> parseFloat
             <|> try parseNumber
             <|> parseString
-
-readExpr :: String -> String
-readExpr input =
-  case parse parseExpr "slapdash" input of
-    Left err  -> "No match: " ++ show err
-    Right val -> "Found value"

@@ -1,6 +1,6 @@
 module Main where
 
-import           Parser             (readExpr)
+import           Slapdash.Parser    (readExpr)
 import           System.Environment
 
 main :: IO ()
